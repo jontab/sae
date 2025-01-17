@@ -25,4 +25,14 @@
         }                                                                                                              \
     } while (0)
 
+#define WARN_CHECK_INT(X, PRED)                                                                                        \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        int ret = (X);                                                                                                 \
+        if (!(ret PRED))                                                                                               \
+        {                                                                                                              \
+            WARN("check failed: " #X #PRED ", value: %d", ret);                                                        \
+        }                                                                                                              \
+    } while (0)
+
 #endif // CHECK_H

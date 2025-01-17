@@ -2,13 +2,27 @@ cmake_minimum_required(VERSION 3.5)
 project(sae)
 
 set(LIB_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/components/buffer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/components/status.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/events/queue.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/args.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/logging.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/logging.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/view.c)
 
 set(LIB_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/components/buffer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/components/component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/components/status.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/events/action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/events/event.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/events/queue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/args.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/check.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/logging.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/logging.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/view.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/termbox2/termbox2.h)
 
 ################################################################################
 # Sae                                                                          #
@@ -26,7 +40,8 @@ add_executable(sae
     ${SAE_HEADERS})
 
 target_include_directories(sae PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/termbox2/)
 
 ################################################################################
 # Tests                                                                        #
@@ -35,6 +50,7 @@ target_include_directories(sae PRIVATE
 set(TESTS_SOURCES
     ${LIB_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/unit_queue.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/munit/munit.c)
 
 set(TESTS_HEADERS

@@ -35,6 +35,9 @@ void logging_printf(LoggingLevel level, const char *format, ...)
     va_start(args, format);
     vfprintf(logging_file, format, args);
     va_end(args);
+
+    fputc('\n', logging_file);
+    fflush(logging_file);
 }
 
 LoggingLevel logging_level_parse(const char *arg)
