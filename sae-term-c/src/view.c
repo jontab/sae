@@ -54,10 +54,12 @@ void view_fini(void)
 
 void view_poll_key(struct tb_event *ev, Event *out)
 {
-    if (isprint(ev->ch))
-    {
-        *out = (Event){.type = EVENT_TYPE_KEY, .ch = ev->ch};
-    }
+    out->type = EVENT_TYPE_KEY;
+    out->data.key = (KeyData){
+        .ch = ev->ch,
+        .mod = ev->mod,
+        .key = ev->key,
+    };
 }
 
 void view_poll_mouse(struct tb_event *ev, Event *out)

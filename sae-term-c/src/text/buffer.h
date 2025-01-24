@@ -1,48 +1,49 @@
-#ifndef ACTION_H
-#define ACTION_H
+#ifndef BUFFER_H
+#define BUFFER_H
 
+#include "char.h"
+#include "list.h"
+#include <stdbool.h>
 #include <stddef.h>
 
-/******************************************************************************/
-/* Enums                                                                      */
-/******************************************************************************/
+struct Line;
 
-enum ActionType
-{
-    ACTION_TYPE_CURSOR_STATUS,
-};
+LIST_GENERATE_HEADER(LineList, line_list, struct Line)
+LIST_GENERATE_HEADER(CharList, char_list, char)
 
 /******************************************************************************/
 /* Typedefs                                                                   */
 /******************************************************************************/
 
-typedef enum ActionType ActionType;
-
-typedef struct CursorStatusData CursorStatusData;
-typedef struct Action           Action;
+typedef struct Line   Line;
+typedef struct Buffer Buffer;
 
 /******************************************************************************/
 /* Structs                                                                    */
 /******************************************************************************/
 
-struct CursorStatusData
+struct Line
 {
-    size_t x;
-    size_t y;
+    size_t begin;
+    size_t end;
 };
 
-struct Action
+struct Buffer
 {
-    ActionType type;
-    union {
-        CursorStatusData cursor_status;
-    } data;
+    LineList lines;
+    CharList chars;
 };
 
 /******************************************************************************/
 /* Methods                                                                    */
 /******************************************************************************/
 
-Action *action_create(ActionType type);
+void   buffer_init(Buffer *self);
+void   buffer_fini(Buffer *self);
+void   buffer_insert(Buffer *self, size_t y, size_t x, char ch);
+void   buffer_remove(Buffer *self, size_t y, size_t x);
+void   buffer_line_content(Buffer *self, size_t at, bool (*iter)(char ch, void *user), void *user);
+size_t buffer_line_length(Buffer *self, size_t at);
+size_t buffer_line_count(Buffer *self);
 
-#endif // ACTION_H
+#endif // BUFFER_H

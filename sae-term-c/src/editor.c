@@ -7,6 +7,7 @@
 #include <string.h>
 
 static void editor_handle_events(Editor *self);
+static void editor_handle_events_key(Editor *self, KeyData *data);
 static void editor_handle_actions(Editor *self);
 
 /******************************************************************************/
@@ -16,10 +17,10 @@ static void editor_handle_actions(Editor *self);
 void editor_init(Editor *self)
 {
     memset(self, 0, sizeof(Editor));
-    buffer_component_init(&self->buffer_component);
-    status_component_init(&self->status_component);
     queue_init(&self->event_tx);
     queue_init(&self->action_tx);
+    buffer_component_init(&self->buffer_component, &self->action_tx);
+    status_component_init(&self->status_component, &self->action_tx);
     self->is_running = true;
 }
 
@@ -62,14 +63,7 @@ void editor_handle_events(Editor *self)
         switch (event->type)
         {
         case EVENT_TYPE_KEY:
-            INFO("event_tx >>> Key(%c)", (char)(event->ch));
-            if (event->ch == 'q')
-            {
-                Action *action = calloc(1, sizeof(Action));
-                CHECK(action);
-                action->type = ACTION_TYPE_QUIT;
-                queue_push(&self->action_tx, action);
-            }
+            editor_handle_events_key(self, &event->data.key);
             break;
         case EVENT_TYPE_TICK:
             break;
@@ -87,15 +81,19 @@ void editor_handle_actions(Editor *self)
     while (queue_pop(&self->action_tx, (void **)(&action)))
     {
         INFO("action_tx >>> %d", action->type);
-        switch (action->type)
-        {
-        case ACTION_TYPE_QUIT:
-            self->is_running = false;
-            break;
-        }
-
         component_handle_action(&self->buffer_component, action);
         component_handle_action(&self->status_component, action);
         free(action);
+    }
+}
+
+void editor_handle_events_key(Editor *self, KeyData *data)
+{
+    INFO("event_tx >>> Key(%c)", (char)(data->ch));
+    bool is_ctrl = data->mod == TB_MOD_CTRL;
+    bool is_e = data->ch == 'e';
+    if (is_ctrl && is_e)
+    {
+        self->is_running = false;
     }
 }

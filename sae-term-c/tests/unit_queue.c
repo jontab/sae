@@ -1,5 +1,5 @@
+#include "events/queue.h"
 #include "munit.h"
-#include "queue.h"
 
 MunitResult unit_queue_push(const MunitParameter params[], void *data)
 {

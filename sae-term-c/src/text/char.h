@@ -1,36 +1,31 @@
-#ifndef BUFFER_COMPONENT_H
-#define BUFFER_COMPONENT_H
+#ifndef CHAR_H
+#define CHAR_H
 
-#include "../events/queue.h"
-#include "../objects/point.h"
-#include "../text/buffer.h"
-#include "component.h"
+#include <stddef.h>
 
 /******************************************************************************/
 /* Typedefs                                                                   */
 /******************************************************************************/
 
-typedef struct BufferComponent BufferComponent;
+typedef struct CharIndex CharIndex;
 
 /******************************************************************************/
 /* Structs                                                                    */
 /******************************************************************************/
 
-struct BufferComponent
+struct CharIndex
 {
-    Component base;
-    Queue    *action_tx;
-    Buffer    buffer;
-    Point     camera;
-    Point     cursor;
-    size_t    cursor_hint;
+    int parent_clock;
+    int parent_site;
+    int clock;
+    int site;
 };
 
 /******************************************************************************/
 /* Methods                                                                    */
 /******************************************************************************/
 
-void buffer_component_init(BufferComponent *self, Queue *action_tx);
-void buffer_component_fini(BufferComponent *self);
+int char_index_compare(const CharIndex *a, const CharIndex *b);
+int char_index_search(const CharIndex *array, int size, const CharIndex *what);
 
-#endif // BUFFER_COMPONENT_H
+#endif // CHAR_H

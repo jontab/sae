@@ -28,10 +28,10 @@
 #define WARN_CHECK_INT(X, PRED)                                                                                        \
     do                                                                                                                 \
     {                                                                                                                  \
-        int ret = (X);                                                                                                 \
-        if (!(ret PRED))                                                                                               \
+        int _ret = (X);                                                                                                \
+        if (!(_ret PRED))                                                                                              \
         {                                                                                                              \
-            WARN("check failed: " #X #PRED ", value: %d", ret);                                                        \
+            WARN("check failed: " #X #PRED ", value: %d", _ret);                                                       \
         }                                                                                                              \
     } while (0)
 
