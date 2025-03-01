@@ -1,6 +1,7 @@
 #ifndef ACTION_H
 #define ACTION_H
 
+#include "mode.h"
 #include <stddef.h>
 
 /******************************************************************************/
@@ -10,6 +11,8 @@
 enum ActionType
 {
     ACTION_TYPE_CURSOR_STATUS,
+    ACTION_TYPE_CHANGE_MODE,
+    ACTION_TYPE_QUIT,
 };
 
 /******************************************************************************/
@@ -19,6 +22,7 @@ enum ActionType
 typedef enum ActionType ActionType;
 
 typedef struct CursorStatusData CursorStatusData;
+typedef struct ChangeModeData   ChangeModeData;
 typedef struct Action           Action;
 
 /******************************************************************************/
@@ -36,6 +40,7 @@ struct Action
     ActionType type;
     union {
         CursorStatusData cursor_status;
+        EditMode         change_mode;
     } data;
 };
 

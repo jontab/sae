@@ -81,6 +81,13 @@ void editor_handle_actions(Editor *self)
     while (queue_pop(&self->action_tx, (void **)(&action)))
     {
         INFO("action_tx >>> %d", action->type);
+
+        //
+        if (action->type == ACTION_TYPE_QUIT)
+        {
+            self->is_running = false;
+        }
+
         component_handle_action(&self->buffer_component, action);
         component_handle_action(&self->status_component, action);
         free(action);

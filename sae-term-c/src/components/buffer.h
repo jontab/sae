@@ -24,6 +24,7 @@ struct BufferComponent
     Point     camera;
     Point     cursor;
     size_t    cursor_hint;
+    EditMode  edit_mode;
 };
 
 /******************************************************************************/

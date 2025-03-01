@@ -9,6 +9,8 @@ struct DrawLineContext;
 
 static void buffer_component_handle_event(BufferComponent *self, Event *event);
 static void buffer_component_handle_event_key(BufferComponent *self, KeyData *data);
+static void buffer_component_handle_event_key_navigate(BufferComponent *self, KeyData *data);
+static void buffer_component_handle_event_key_modify(BufferComponent *self, KeyData *data);
 static void buffer_component_handle_action(BufferComponent *self, Action *action);
 static void buffer_component_draw(BufferComponent *self);
 static bool buffer_component_draw_line(char ch, void *data);
@@ -89,10 +91,33 @@ void buffer_component_handle_event(BufferComponent *self, Event *event)
 
 void buffer_component_handle_event_key(BufferComponent *self, KeyData *data)
 {
-    if (!data->mod && !data->key)
+    switch (self->edit_mode)
     {
-        buffer_insert(&self->buffer, self->cursor.y, self->cursor.x, data->ch);
-        buffer_component_handle_right(self);
+    case EDIT_MODE_INSERT:
+        buffer_component_handle_event_key_modify(self, data);
+        // Fall into the next case.
+    case EDIT_MODE_NORMAL:
+        buffer_component_handle_event_key_navigate(self, data);
+        break;
+    default:
+        break;
+    }
+}
+
+void buffer_component_handle_event_key_navigate(BufferComponent *self, KeyData *data)
+{
+    if (data->ch == 'i')
+    {
+        Action *action = action_create(ACTION_TYPE_CHANGE_MODE);
+        action->data.change_mode = EDIT_MODE_INSERT;
+        queue_push(self->action_tx, action);
+    }
+
+    if ((self->edit_mode == EDIT_MODE_NORMAL) && (data->ch == ':'))
+    {
+        Action *action = action_create(ACTION_TYPE_CHANGE_MODE);
+        action->data.change_mode = EDIT_MODE_COMMAND;
+        queue_push(self->action_tx, action);
     }
 
     switch (data->key)
@@ -109,12 +134,21 @@ void buffer_component_handle_event_key(BufferComponent *self, KeyData *data)
     case TB_KEY_ARROW_RIGHT:
         buffer_component_handle_right(self);
         break;
-    case TB_KEY_ENTER:
-        buffer_insert(&self->buffer, self->cursor.y, self->cursor.x, '\n');
-        self->cursor.y++;
-        self->cursor_hint = self->cursor.x = 0;
-        buffer_component_update_cursor_status(self);
+    default:
         break;
+    }
+}
+
+void buffer_component_handle_event_key_modify(BufferComponent *self, KeyData *data)
+{
+    if (!data->mod && !data->key)
+    {
+        buffer_insert(&self->buffer, self->cursor.y, self->cursor.x, data->ch);
+        buffer_component_handle_right(self);
+    }
+
+    switch (data->key)
+    {
     case TB_KEY_BACKSPACE:
     case TB_KEY_BACKSPACE2:
         buffer_component_handle_left(self);
@@ -123,6 +157,19 @@ void buffer_component_handle_event_key(BufferComponent *self, KeyData *data)
     case TB_KEY_TAB:
         buffer_insert(&self->buffer, self->cursor.y, self->cursor.x, '\t');
         buffer_component_handle_right(self);
+        break;
+    case TB_KEY_ENTER:
+        buffer_insert(&self->buffer, self->cursor.y, self->cursor.x, '\n');
+        self->cursor.y++;
+        self->cursor_hint = self->cursor.x = 0;
+        buffer_component_update_cursor_status(self);
+        break;
+    case TB_KEY_ESC: {
+        Action *action = action_create(ACTION_TYPE_CHANGE_MODE);
+        action->data.change_mode = EDIT_MODE_NORMAL;
+        queue_push(self->action_tx, action);
+        break;
+    }
     default:
         break;
     }
@@ -130,8 +177,14 @@ void buffer_component_handle_event_key(BufferComponent *self, KeyData *data)
 
 void buffer_component_handle_action(BufferComponent *self, Action *action)
 {
-    (void)(self);
-    (void)(action);
+    switch (action->type)
+    {
+    case ACTION_TYPE_CHANGE_MODE:
+        self->edit_mode = action->data.change_mode;
+        break;
+    default:
+        break;
+    }
 }
 
 void buffer_component_draw(BufferComponent *self)
@@ -160,7 +213,15 @@ void buffer_component_draw(BufferComponent *self)
         }
     }
 
-    buffer_component_draw_cursor(self, &view_anchor, &view_size, &self->cursor);
+    switch (self->edit_mode)
+    {
+    case EDIT_MODE_NORMAL:
+    case EDIT_MODE_INSERT:
+        buffer_component_draw_cursor(self, &view_anchor, &view_size, &self->cursor);
+        break;
+    default:
+        break;
+    }
 }
 
 bool buffer_component_draw_line(char ch, void *data)

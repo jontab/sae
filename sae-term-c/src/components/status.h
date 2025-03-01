@@ -22,6 +22,10 @@ struct StatusComponent
     Queue    *action_tx;
     size_t    known_cursor_x;
     size_t    known_cursor_y;
+    EditMode  edit_mode;
+    size_t    command_x_offset; // `EDIT_MODE_COMMAND`.
+    size_t    command_x;        // `EDIT_MODE_COMMAND`.
+    char     *command_buffer;   // `EDIT_MODE_COMMAND`.
 };
 
 /******************************************************************************/
