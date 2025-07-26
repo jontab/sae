@@ -1,19 +1,19 @@
-CC      := gcc
-LD      := gcc
+CC       := gcc
+LD       := gcc
 
-BIN     := bin
-INC     := inc
-SRC     := src
-VEN     := ven
+BIN      := bin
+INC      := inc
+SRC      := src
+VEN      := ven
 
-CFLAGS  := -I$(INC)
-LDFLAGS := -lncurses
+CFLAGS   := -I$(INC)
+LDFLAGS  := -lncurses -ltinfo -static
 
-EXE     := $(BIN)/sae
+EXE      := $(BIN)/sae
 
-INCS    := $(shell find $(INC) -name "*.h" | sort)
-SRCS    := $(shell find $(SRC) -name "*.c" | sort)
-OBJS    := $(patsubst %.c, %.o, $(SRCS))
+INCS     := $(shell find $(INC) -name "*.h" | sort)
+SRCS     := $(shell find $(SRC) -name "*.c" | sort)
+OBJS     := $(patsubst %.c, %.o, $(SRCS))
 
 debug:   CFLAGS += -O0 -g
 debug:   all

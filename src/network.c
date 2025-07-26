@@ -167,6 +167,9 @@ void network_handle(Network *n, int file, Editor *e)
             }
 
             editor_insert_item(e, item);
+
+            if (n->mode == SERVER)
+                network_insert_broadcast(n, item, file);
         }
         break;
 
@@ -184,6 +187,9 @@ void network_handle(Network *n, int file, Editor *e)
             site = ntohl(site);
             clock = ntohl(clock);
             editor_delete_item(e, site, clock);
+
+            if (n->mode == SERVER)
+                network_delete_broadcast(n, site, clock, file);
         }
         break;
 
